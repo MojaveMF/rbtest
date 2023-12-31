@@ -64,7 +64,13 @@
       "targets": "all",
       "identifier": "eco.syntax.bootstrapper",
       "icon": [
-        "icons/Bootstrapper.ico"
+        "icons/Bootstrapper.ico",
+        "icons/Bootstrapper-1.png",
+        "icons/Bootstrapper-2.png",
+        "icons/Bootstrapper-3.png",
+        "icons/Bootstrapper-4.png",
+        "icons/Bootstrapper-5.png",
+        "icons/Bootstrapper-6.png"
       ]
     },
     "security": {
