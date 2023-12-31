@@ -18,6 +18,7 @@ codegen-units = 1
 [lib]
 path = "src/macros/lib.rs"
 name = "macros"
+crate-type = ["rlib"]
 proc-macro = true
 
 
@@ -36,15 +37,19 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 reqwest = { version = "0.11.23", features = ["stream"] }
 chrono = "0.4.31"
-toml = "0.8.8"
-serde_ini = "0.2.0"
 dirs = "5.0.1"
 tokio = { version = "1.35.1", features = ["fs"] }
-winreg = "0.52.0"
 zip-extract = "0.1.2"
 futures-util = "0.3.30"
 serde-xml-rs = "0.6.0"
 
+# Remove platform specific dependencies
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52.0"
+
+[target.'cfg(not(windows)).dependencies']
+serde_ini = "0.2.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
