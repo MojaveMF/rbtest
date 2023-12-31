@@ -69,6 +69,8 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 #[cfg(target_os = "windows")]
 fn launch_client(client_path: PathBuf, auth_ticket: &str, joinscript: &str) -> Result<()> {
+    use std::process::exit;
+
     let mut cmd = Command::new(client_path);
     cmd.args([
         "--play",
@@ -80,7 +82,8 @@ fn launch_client(client_path: PathBuf, auth_ticket: &str, joinscript: &str) -> R
         auth_ticket,
     ]);
     cmd.spawn()?;
-    //exit(0);
+
+    exit(0);
     Ok(())
 }
 
@@ -96,13 +99,15 @@ fn launch_client(client_path: PathBuf, auth_ticket: &str, joinscript: &str) -> R
         "--play",
         "--authenticationUrl",
         &format!("https://{}/Login/Negotiate.ashx", BASE_URL),
-        "--authenticationTicket",
-        auth_ticket,
         "--joinScriptUrl",
         joinscript,
+        "--authenticationTicket",
+        auth_ticket,
     ]);
     cmd.spawn()?;
     exit(0);
+
+    Ok(())
 }
 
 #[derive(Debug, Serialize)]
