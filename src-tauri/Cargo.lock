@@ -2988,7 +2988,6 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tokio",
- "toml 0.8.8",
  "winreg 0.52.0",
  "zip-extract",
 ]

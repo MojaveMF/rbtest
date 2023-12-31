@@ -18,7 +18,6 @@ codegen-units = 1
 [lib]
 path = "src/macros/lib.rs"
 name = "macros"
-crate-type = ["rlib"]
 proc-macro = true
 
 
@@ -48,7 +47,7 @@ serde-xml-rs = "0.6.0"
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
 
-[target.'cfg(not(windows)).dependencies']
+[target.'cfg(target_os = "linux")'.dependencies]
 serde_ini = "0.2.0"
 
 [features]
