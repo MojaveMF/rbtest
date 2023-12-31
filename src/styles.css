@@ -1,0 +1,85 @@
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  
+  color: #f6f6f6;
+  background-color: #191919;
+
+  user-select: none;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+.container {
+  margin: 0;
+  padding-top: 10vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.drag_bar {
+  overflow: hidden;
+  width: 100%;
+  height: 30px;
+  position: absolute;
+  top: 0;
+  background-color: #191919;
+}
+
+.logo {
+  text-align: center;
+  font-size: 60px;
+  will-change: filter;
+  line-height: 1.2;
+  transition: 0.75s;
+}
+
+.bang-line {
+  font-size: small;
+  padding: 0px;
+  font-weight: 400;
+  margin-top: 0px;
+  text-align: center;
+  color: #adb5bd;
+}
+
+.bar_holder {
+  display: flex;
+  justify-content: center;
+}
+
+.load_bar {
+  width: 80%;
+  height: 22px;
+  border: 1px solid #495057;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #141414
+}
+
+.progress {
+  height: 100%;
+  background-color: #0d6efd;
+  will-change: filter;
+}
+
+.footer_container {
+  padding-left: 4px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+.footer_text {
+  font-size: xx-small;
+  color: #5c5c59;
+}
