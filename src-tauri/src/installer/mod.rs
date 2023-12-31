@@ -1,5 +1,5 @@
 use std::fs as sfs;
-use std::process::{ Command, exit };
+use std::process::Command;
 use std::{ error::Error, path::PathBuf };
 use std::fmt::Display;
 use reqwest::{ get, ClientBuilder };

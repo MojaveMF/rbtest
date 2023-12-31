@@ -2,8 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{ fmt::Display, error::Error };
-
-use installer::generate_appsettings;
 use tauri::Manager;
 
 mod installer;
