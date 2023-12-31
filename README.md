@@ -1,7 +1,7 @@
-# Tauri + Svelte + Typescript
+# Syntax Launcher
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
+### About
 
-## Recommended IDE Setup
+This is a project written in tauri (A framework for rust and javascript that is fast)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+All the hardwork is done on the rust side while the flow of the program is managed by the frontend wrote in svelte
