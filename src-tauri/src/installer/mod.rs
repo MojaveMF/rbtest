@@ -7,6 +7,7 @@ use futures_util::StreamExt;
 use serde::Serialize;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
+use std::process::exit;
 
 pub mod uri;
 
@@ -69,8 +70,6 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 #[cfg(target_os = "windows")]
 fn launch_client(client_path: PathBuf, auth_ticket: &str, joinscript: &str) -> Result<()> {
-    use std::process::exit;
-
     let mut cmd = Command::new(client_path);
     cmd.args([
         "--play",
