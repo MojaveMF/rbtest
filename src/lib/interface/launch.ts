@@ -139,7 +139,7 @@ export async function HandleLaunch() {
     await CreateShortcuts(await GetStudioVersions());
     SetTaskbar(`Done closing...`, 100);
     setTimeout(async () => {
-      //await exit(0);
+      await exit(0);
     }, 2000);
   }
 }
