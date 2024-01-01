@@ -62,13 +62,10 @@ pub async fn download_and_extract<U: AsRef<str>, O: AsRef<Path>>(url: U, out: O)
 pub async fn create_manifest_dirs<L: AsRef<Path>>(location: L, paths: Vec<&str>) -> Result<()> {
     let location = location.as_ref().to_path_buf();
     for path in paths {
-        let mut p = "./".to_string();
-        for split in path.split("/") {
-            p += split;
-            let dir = location.join(&p);
-            if !dir.exists() {
-                fs::create_dir(location.join(&p))?;
-            }
+        let dir = location.join(path);
+        println!("{}", path);
+        if !dir.exists() {
+            fs::create_dir(dir)?;
         }
     }
 
