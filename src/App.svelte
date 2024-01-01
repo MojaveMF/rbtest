@@ -2,19 +2,13 @@
   import { onMount } from "svelte";
   import Footer from "./lib/footer.svelte";
   import { invoke } from "@tauri-apps/api";
-  import {
-    GetLatestversion,
-    GetManifest,
-    GetStudios,
-    GetValidClients,
-    InstallClient,
-    InstallStudio,
-    StudioInstalled,
-  } from "./lib/interface/index";
+  import { GetStudios, InstallStudio, StudioInstalled } from "./lib/interface/index";
+  import Installer, { GetLatestversion, GetValidClients } from "./lib/interface/client";
+  import Loading from "./lib/loading.svelte";
 
   onMount(async () => {
-    let latest = GetLatestversion();
-    console.log(await InstallClient("2016"));
+    let installer = new Installer("2020", await GetLatestversion());
+    await installer.Download();
   });
 </script>
 
@@ -23,6 +17,8 @@
   SYNTAX
   <p class="bang-line">experience joy with freedom</p>
 </h1>
+
+<Loading />
 
 <!--
 {#if failure === undefined}

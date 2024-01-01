@@ -1,5 +1,7 @@
 use std::{ collections::HashMap, fmt::Display };
 
+use tauri::api::version;
+
 use crate::installer::{
     studio,
     download_from_repo,
@@ -73,7 +75,13 @@ pub async fn prepare_client(
     version: &str,
     manifest: HashMap<String, String>
 ) -> Result<()> {
+    println!("{:?}", manifest);
     convert_err(player::prepare_client(year, version, manifest).await)
+}
+
+#[tauri::command]
+pub fn client_installed(year: &str, version: &str) -> bool {
+    player::installed(year, version)
 }
 
 #[tauri::command]

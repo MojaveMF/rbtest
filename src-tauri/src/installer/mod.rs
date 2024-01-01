@@ -63,9 +63,9 @@ pub async fn create_manifest_dirs<L: AsRef<Path>>(location: L, paths: Vec<&str>)
     let location = location.as_ref().to_path_buf();
     for path in paths {
         let dir = location.join(path);
-        println!("{}", path);
+
         if !dir.exists() {
-            fs::create_dir(dir)?;
+            fs::create_dir_all(dir)?;
         }
     }
 

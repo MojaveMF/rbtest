@@ -30,6 +30,7 @@ fn main() {
                 commands::get_client_manifest,
                 commands::download_zip,
                 commands::extract_zip,
+                commands::client_installed,
                 commands::prepare_client,
                 commands::get_client_folder,
                 commands::get_latest_version

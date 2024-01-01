@@ -1,5 +1,6 @@
-import { invoke, path } from "@tauri-apps/api";
-import { promise, z } from "zod";
+import { invoke } from "@tauri-apps/api";
+import { emit } from "@tauri-apps/api/event";
+import { z } from "zod";
 
 let validClientsCache: Array<string> | undefined;
 let manifestSchema = z.record(z.string().endsWith(".zip"), z.string());
@@ -32,11 +33,11 @@ export async function GetLatestversion(): Promise<string> {
   return GetLatestversion();
 }
 
-async function GetClientFolder(year: string, version: string): Promise<string> {
+export async function GetClientFolder(year: string, version: string): Promise<string> {
   return await invoke("get_client_folder", { year, version });
 }
 
-async function download_zip(fileName: string) {
+export async function download_zip(fileName: string) {
   try {
     return await invoke("download_zip", { fileName });
   } catch (err) {
@@ -45,7 +46,7 @@ async function download_zip(fileName: string) {
   }
 }
 
-async function extract_zip(fileName: string, location: string) {
+export async function extract_zip(fileName: string, location: string) {
   console.log(fileName, location);
   try {
     return await invoke("extract_zip", { fileName, location });
@@ -55,28 +56,21 @@ async function extract_zip(fileName: string, location: string) {
   }
 }
 
-async function prepare_client(year: string, version: string, manifest: { [key: string]: string }) {
+export async function prepare_client(
+  year: string,
+  version: string,
+  manifest: { [key: string]: string }
+) {
+  console.log(manifest);
   return await invoke("prepare_client", { year, version, manifest });
 }
 
-export async function InstallClient(year: string) {
-  let version = await GetLatestversion();
-  let folder = await GetClientFolder(year, version);
-  let manifest = await GetManifest(year);
+export async function clientInstalled(year: string, version: string): Promise<boolean> {
+  return await invoke("client_installed", { year, version });
+}
 
-  try {
-    await prepare_client(year, version, manifest);
-  } catch (err) {}
-
-  let downloads = [];
-  for (let key of Object.keys(manifest)) {
-    downloads.push(download_zip(`${version}-${key}`));
+export async function SetTaskbar(...args: Array<string | number>) {
+  for (let arg of args) {
+    await emit("set_taskbar", arg);
   }
-  await Promise.all(downloads);
-
-  let extraction = [];
-  for (let [filename, location] of Object.entries(manifest)) {
-    extraction.push(extract_zip(`${version}-${filename}`, await path.join(folder, location)));
-  }
-  await Promise.all(extraction);
 }
