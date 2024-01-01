@@ -10,12 +10,7 @@ use super::{ paths, download_from_repo, create_manifest_dirs, BASE_URL };
 use super::Result;
 
 #[derive(Debug, Serialize)]
-struct AppSettings {
-    #[serde(rename = "Settings")]
-    pub settings: AppSettingsSettings,
-}
-#[derive(Debug, Serialize)]
-struct AppSettingsSettings {
+struct Settings {
     #[serde(rename = "ContentFolder")]
     content_folder: String,
     #[serde(rename = "BaseUrl")]
@@ -26,11 +21,9 @@ struct AppSettingsSettings {
 */
 pub async fn generate_appsettings<P: AsRef<Path>>(location: P) -> Result<()> {
     let location = location.as_ref();
-    let settings = AppSettings {
-        settings: AppSettingsSettings {
-            content_folder: "content".into(),
-            base_url: BASE_URL.into(),
-        },
+    let settings = Settings {
+        content_folder: "content".into(),
+        base_url: BASE_URL.into(),
     };
 
     let encoded = serde_xml_rs::to_string(&settings)?;
@@ -108,12 +101,12 @@ pub async fn launch_client<T: AsRef<str>, V: AsRef<str>>(
     args: &[&str]
 ) -> Result<()> {
     let client_folder = get_client_folder(year, version)?;
-    let mut player_executeable = client_folder.join("SyntaxPlayerBeta.exe");
+    let mut player_exe = client_folder.join("SyntaxPlayerBeta.exe");
 
-    if !player_executeable.exists() {
-        player_executeable = client_folder.join("RobloxPlayerBeta.exe");
+    if !player_exe.exists() {
+        player_exe = client_folder.join("RobloxPlayerBeta.exe");
     }
 
-    launch_application(player_executeable, args)?;
+    launch_application(player_exe, args)?;
     Ok(())
 }

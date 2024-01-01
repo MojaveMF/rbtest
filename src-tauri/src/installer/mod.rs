@@ -101,6 +101,7 @@ impl Error for CouldntLocateExe {}
 pub fn launch_application<P: AsRef<Path>>(path: P, args: &[&str]) -> Result<()> {
     let path = path.as_ref();
     let mut cmd = Command::new(path);
+
     cmd.args(args);
     cmd.spawn()?;
 

@@ -28,7 +28,7 @@ pub async fn create_studio_shortcuts(versions: Vec<&str>) -> Result<()> {
     let Some(target) = exe_path.to_str() else {
         return Err(CouldntLocateExe.into());
     };
-    println!("Generating studio versions");
+
     for year in versions {
         let target = format!("{}", target);
         let output_location = path.join(format!("Syntax Studio {}.lnk", year));
