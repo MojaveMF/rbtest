@@ -21,7 +21,7 @@ impl Display for CouldntLocateExe {
 
 impl Error for CouldntLocateExe {}
 
-pub fn create_studio_shortcuts(versions: Vec<&str>) -> Result<()> {
+pub async fn create_studio_shortcuts(versions: Vec<&str>) -> Result<()> {
     println!("Getting paths");
     let path = paths::shortcut_path()?;
     let exe_path = env::current_exe()?;
