@@ -21,6 +21,10 @@ pub const TARGET_BRANCH: &str = "release";
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+pub async fn latest_version() -> Result<String> {
+    Ok(reqwest::get(format!("https://{}/version", SETUP_URL)).await?.text().await?)
+}
+
 pub async fn download_file<U: AsRef<str>, L: AsRef<Path>>(url: U, location: L) -> Result<()> {
     let url = url.as_ref();
     let file = location.as_ref();

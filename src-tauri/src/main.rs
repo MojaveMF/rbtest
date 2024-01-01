@@ -27,7 +27,12 @@ fn main() {
                 commands::studio_installed,
                 commands::install_studio,
                 commands::get_valid_clients,
-                commands::get_client_manifest
+                commands::get_client_manifest,
+                commands::download_zip,
+                commands::extract_zip,
+                commands::prepare_client,
+                commands::get_client_folder,
+                commands::get_latest_version
             ]
         )
         .setup(|app| {

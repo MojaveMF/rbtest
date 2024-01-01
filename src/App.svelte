@@ -3,15 +3,18 @@
   import Footer from "./lib/footer.svelte";
   import { invoke } from "@tauri-apps/api";
   import {
+    GetLatestversion,
     GetManifest,
     GetStudios,
     GetValidClients,
+    InstallClient,
     InstallStudio,
     StudioInstalled,
   } from "./lib/interface/index";
 
   onMount(async () => {
-    console.log(await GetManifest("2020"));
+    let latest = GetLatestversion();
+    console.log(await InstallClient("2016"));
   });
 </script>
 
