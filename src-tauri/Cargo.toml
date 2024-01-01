@@ -25,7 +25,8 @@ proc-macro = true
 tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = [ "path-all",
+tauri = { version = "1.5", features = [
+    "path-all",
     "process-exit",
     "window-set-focus",
     "window-center",
@@ -46,9 +47,9 @@ rand = "0.8.5"
 # Remove platform specific dependencies
 
 [target.'cfg(windows)'.dependencies]
+mslnk = "0.1.8"
 winreg = "0.52.0"
-
-[target.'cfg(target_os = "linux")'.dependencies]
+#[target.'cfg(target_os = "linux")'.dependencies]
 serde_ini = "0.2.0"
 
 [features]

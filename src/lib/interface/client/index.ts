@@ -1,8 +1,40 @@
-import { path } from "@tauri-apps/api";
+import { invoke, path } from "@tauri-apps/api";
 import { emit } from "@tauri-apps/api/event";
-import { GetClientFolder, GetManifest, download_zip, extract_zip, prepare_client } from "./utility";
+import {
+  GetClientFolder,
+  GetManifest,
+  SetTaskbar,
+  clientInstalled,
+  download_zip,
+  extract_zip,
+  prepare_client,
+} from "./utility";
+import { GetBootstrapperInfo, type LaunchArguments } from "..";
+import { exit } from "@tauri-apps/api/process";
 
 export * from "./utility";
+
+export async function LaunchClient(year: string, version: string, launch_args: LaunchArguments) {
+  let base_url = (await GetBootstrapperInfo()).base_url;
+  await invoke("launch_client", {
+    year,
+    version,
+    args: [
+      "--play",
+      "--authenticationUrl",
+      `https://${base_url}/Login/Negotiate.ashx`,
+      "--authenticationTicket",
+      launch_args.auth_ticket,
+      "--joinScriptUrl",
+      launch_args.join_script,
+    ],
+  });
+
+  await SetTaskbar("Studio launched", 100);
+  setTimeout(async () => {
+    await exit(0);
+  }, 3000);
+}
 
 export default class Installer {
   private Year: string;
@@ -54,6 +86,11 @@ export default class Installer {
   }
 
   public async Download() {
+    if (await clientInstalled(this.Year, this.Version)) {
+      this.Taskbar("Client already installed", 100);
+      return;
+    }
+
     this.Taskbar("Downloading client manifest", 0);
 
     await this.DownloadManifest();

@@ -4,6 +4,8 @@ use std::path::{ PathBuf, Path };
 
 use serde::Serialize;
 
+use crate::installer::launch_application;
+
 use super::{ paths, download_from_repo, create_manifest_dirs, BASE_URL };
 use super::Result;
 
@@ -97,5 +99,21 @@ pub async fn prepare_client<T: AsRef<str>, V: AsRef<str>>(
 
     create_manifest_dirs(&client_path, values).await?;
 
+    Ok(())
+}
+
+pub async fn launch_client<T: AsRef<str>, V: AsRef<str>>(
+    year: T,
+    version: V,
+    args: &[&str]
+) -> Result<()> {
+    let client_folder = get_client_folder(year, version)?;
+    let mut player_executeable = client_folder.join("SyntaxPlayerBeta.exe");
+
+    if !player_executeable.exists() {
+        player_executeable = client_folder.join("RobloxPlayerBeta.exe");
+    }
+
+    launch_application(player_executeable, args)?;
     Ok(())
 }

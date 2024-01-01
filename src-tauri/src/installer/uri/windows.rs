@@ -1,8 +1,12 @@
 use std::env;
 use std::error::Error;
 use std::fmt::Display;
+use mslnk::ShellLink;
 use winreg::RegKey;
 use winreg::enums::*;
+use mslnk;
+
+use crate::installer::paths;
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -16,6 +20,29 @@ impl Display for CouldntLocateExe {
 }
 
 impl Error for CouldntLocateExe {}
+
+pub fn create_studio_shortcuts(versions: Vec<&str>) -> Result<()> {
+    println!("Getting paths");
+    let path = paths::shortcut_path()?;
+    let exe_path = env::current_exe()?;
+    let Some(target) = exe_path.to_str() else {
+        return Err(CouldntLocateExe.into());
+    };
+    println!("Generating studio versions");
+    for year in versions {
+        let target = format!("{}", target);
+        let output_location = path.join(format!("Syntax Studio {}.lnk", year));
+        if output_location.exists() {
+            continue;
+        }
+        println!("{}", output_location.display());
+        let mut sl = ShellLink::new(target)?;
+        sl.set_arguments(Some(format!("--studio {}", year)));
+        sl.create_lnk(output_location)?;
+    }
+
+    Ok(())
+}
 
 /* This function is wrongly a future but thats to keep compatability with the linux function */
 pub async fn set_defaults() -> Result<()> {

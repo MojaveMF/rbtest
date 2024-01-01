@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
-use super::{ paths, download_from_repo, download_and_extract };
+use super::{ paths, download_from_repo, download_and_extract, launch_application };
 use super::Result;
 
 pub fn get_studio_folder<T: AsRef<str>>(year: T) -> Result<PathBuf> {
@@ -32,5 +32,17 @@ pub async fn download_studio<V: AsRef<str>, U: AsRef<str>>(year: V, url: U) -> R
     let studio_folder = get_studio_folder(year)?;
     download_and_extract(url, studio_folder).await?;
 
+    Ok(())
+}
+
+pub async fn launch_studio<V: AsRef<str>>(year: V) -> Result<()> {
+    let studio_folder = get_studio_folder(year)?;
+    let mut studio_executeable = studio_folder.join("RobloxStudioBeta.exe");
+
+    if !studio_executeable.exists() {
+        studio_executeable = studio_folder.join("SyntaxStudioBeta.exe");
+    }
+
+    launch_application(studio_executeable, &[])?;
     Ok(())
 }

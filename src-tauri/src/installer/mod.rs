@@ -1,6 +1,7 @@
-use std::{ error::Error, path::Path, fs::{ self, File }, io::Write };
+use std::{ error::Error, path::Path, fs::{ self, File }, io::Write, fmt::Display };
 use futures_util::StreamExt;
 use rand::{ distributions::Alphanumeric, Rng };
+use std::process::Command;
 
 pub mod uri;
 pub mod paths;
@@ -83,4 +84,40 @@ pub async fn download_from_repo<T: AsRef<str>>(file: T) -> Result<Vec<u8>> {
     );
 
     Ok(reqwest::get(target_file).await?.bytes().await?.to_vec())
+}
+
+#[derive(Debug)]
+pub struct CouldntLocateExe;
+
+impl Display for CouldntLocateExe {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Couldnt locate the binary")
+    }
+}
+
+impl Error for CouldntLocateExe {}
+
+#[cfg(target_os = "windows")]
+pub fn launch_application<P: AsRef<Path>>(path: P, args: &[&str]) -> Result<()> {
+    let path = path.as_ref();
+    let mut cmd = Command::new(path);
+    cmd.args(args);
+    cmd.spawn()?;
+
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+pub fn launch_application<P: AsRef<Path>>(path: P, args: &[&str]) -> Result<()> {
+    let path = path.as_ref();
+    let Some(path_string) = path.to_str() else {
+        return Err(CouldntLocateExe.into());
+    };
+
+    let mut cmd = Command::new("wine");
+    cmd.arg(path_string);
+    cmd.args(args);
+    cmd.spawn()?;
+
+    Ok(())
 }

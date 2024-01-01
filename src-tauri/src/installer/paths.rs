@@ -22,7 +22,7 @@ impl Error for ErrNoPath {}
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 fn dir_option_wrapper(dir: Option<PathBuf>) -> Result<PathBuf> {
-    let Some(path) = dirs::data_local_dir() else {
+    let Some(path) = dir else {
         let path = ErrNoPath { path: format!("{:?}", dir) };
         return Err(path.into());
     };
@@ -32,7 +32,7 @@ fn dir_option_wrapper(dir: Option<PathBuf>) -> Result<PathBuf> {
 
 fn dir_wrapper(path: PathBuf) -> Result<PathBuf> {
     if !path.exists() {
-        fs::create_dir(&path)?;
+        fs::create_dir_all(&path)?;
     }
 
     return Ok(path);
@@ -62,6 +62,21 @@ pub fn get_studio_folder() -> Result<PathBuf> {
     dir_wrapper(studios)
 }
 
+#[cfg(target_os = "windows")]
+pub fn shortcut_path() -> Result<PathBuf> {
+    let location = dir_option_wrapper(dirs::home_dir())?
+        .join("AppData")
+        .join("Roaming")
+        .join("Microsoft")
+        .join("Windows")
+        .join("Start Menu")
+        .join("Programs")
+        .join("SYNTAX");
+
+    return dir_wrapper(location);
+}
+
+/* 
 pub fn get_year_folder<T: AsRef<str>>(year: T) -> Result<PathBuf> {
     let string: &str = year.as_ref();
     return dir_wrapper(get_clients_folder()?.join(string));
@@ -72,3 +87,4 @@ pub fn get_version_folder<T: AsRef<str>, Y: AsRef<str>>(year: T, version: Y) -> 
     let version: &str = version.as_ref();
     return dir_wrapper(year_folder.join(version));
 }
+*/

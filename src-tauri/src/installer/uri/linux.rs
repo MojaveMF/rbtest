@@ -1,4 +1,4 @@
-use std::{ error::Error, env, fmt::Display, collections::HashMap, path::PathBuf };
+use std::{ error::Error, env, fmt::Display, collections::HashMap, path::PathBuf, process::Command };
 use serde::{ Serialize, Deserialize };
 use tokio::fs;
 
@@ -76,7 +76,7 @@ impl Display for CouldntFindDefault {
 
 impl Error for CouldntFindDefault {}
 
-pub fn generate_desktop_str() -> Result<String> {
+pub fn generate_desktop_str(arguments: &[&str]) -> Result<String> {
     let exe_path = env::current_exe()?;
     let Some(location) = exe_path.to_str() else {
         return Err(CouldntLocateExe.into());
@@ -85,7 +85,7 @@ pub fn generate_desktop_str() -> Result<String> {
     let desktop = Entry {
         desktop: Desktop {
             name: "SYNTAX".into(),
-            exec: format!("{} %u", location),
+            exec: format!("{} {} %u", location, arguments.join(" ")),
             terminal: "false".into(),
             app_type: "Application".into(),
             mime_type: "x-scheme-handler/syntax-player;".into(),
@@ -106,69 +106,47 @@ pub fn generate_mimetypes_str() -> Result<String> {
     Ok(serde_ini::to_string(&values)?)
 }
 
-async fn generate_desktop() -> Result<()> {
-    let desktop_content = generate_desktop_str()?;
+async fn generate_uri<P: AsRef<str>, U: AsRef<str>>(desktop_file_name: P, uri: U) -> Result<()> {
+    let uri = uri.as_ref();
+    let name = desktop_file_name.as_ref();
+    let generated_uri: String = format!("x-scheme-handler/{}", uri);
+    let mut cmd = Command::new("xdg-mime");
+    cmd.args(["default", name, &generated_uri]);
+
+    cmd.spawn()?.wait()?;
+
+    Ok(())
+}
+
+async fn generate_desktop<T: AsRef<str>>(
+    name: T,
+    arguments: &[&str],
+    uri: Option<&str>
+) -> Result<()> {
+    let desktop_content = generate_desktop_str(arguments)?;
     let Some(data_dir) = dirs::data_local_dir() else {
         return Err(CouldntGetFolder.into());
     };
-    let desktop_file = data_dir.join("applications").join("syntax-player.desktop");
+    let name = format!("{}.desktop", name.as_ref());
+    let desktop_file = data_dir.join("applications").join(&name);
+    if !desktop_file.exists() {
+        fs::write(desktop_file, desktop_content).await?;
 
-    fs::write(desktop_file, desktop_content).await?;
-    Ok(())
-}
-
-async fn create_mimetypes(location: PathBuf) -> Result<()> {
-    let content = format!("[Default Applications]\n{}", generate_mimetypes_str()?);
-    fs::write(location, content).await?;
-    Ok(())
-}
-
-async fn add_to_mimetypes(location: PathBuf) -> Result<()> {
-    if !location.exists() {
-        return create_mimetypes(location).await;
+        if let Some(to_reg) = uri {
+            generate_uri(name, to_reg).await?;
+        }
     }
-    let content_future = fs::read(&location);
-    let content = generate_mimetypes_str()?;
-    let old_content = String::from_utf8(content_future.await?)?;
-
-    if old_content.contains(&content) {
-        return Ok(());
-    }
-
-    let new = old_content.replace(
-        "[Default Applications]\n",
-        &format!("[Default Applications]\n{}", content)
-    );
-    fs::write(location, new).await?;
-
     Ok(())
 }
 
-async fn generate_mimetypes() -> Result<()> {
-    let Some(cfg_dir) = dirs::config_dir() else {
-        return Err(CouldntGetFolder.into());
-    };
-    let Some(data_dir) = dirs::data_local_dir() else {
-        return Err(CouldntGetFolder.into());
-    };
-
-    /* Start both of them so they can run at the same time */
-    let future_one = add_to_mimetypes(cfg_dir.join("mimeapps.list"));
-    let future_two = add_to_mimetypes(data_dir.join("mimeapps.list"));
-
-    future_one.await?;
-    future_two.await?;
-
-    Ok(())
-}
-
-/* I DO NOT KNOW IF THIS WORKS I AM WRITING THIS ON WINDOWS BUT IN THEROY THIS SHOULD RUN */
 pub async fn set_defaults() -> Result<()> {
-    let future_one = generate_mimetypes();
-    let future_two = generate_desktop();
+    generate_desktop("syntax-desktop", &[], Some("syntax-player")).await
+}
 
-    future_one.await?;
-    future_two.await?;
+pub async fn create_studio_shortcuts(versions: Vec<&str>) -> Result<()> {
+    for version in versions {
+        generate_desktop(format!("syntax-studio-{}", version), &["--studio", version], None).await?;
+    }
 
     Ok(())
 }

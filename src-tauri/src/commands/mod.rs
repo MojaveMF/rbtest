@@ -1,5 +1,6 @@
-use std::{ collections::HashMap, fmt::Display };
+use std::{ collections::HashMap, fmt::Display, env };
 
+use serde::Serialize;
 use tauri::api::version;
 
 use crate::installer::{
@@ -92,4 +93,45 @@ pub async fn get_client_folder(year: &str, version: &str) -> Result<String> {
         return Err("Couldnt get client folder".into());
     };
     Ok(folder.into())
+}
+
+#[derive(Serialize)]
+pub struct BootstrapperInfo {
+    base_url: String,
+    compile_time: String,
+    pkg_version: String,
+}
+
+#[tauri::command]
+pub fn get_bootstrapper_info() -> BootstrapperInfo {
+    BootstrapperInfo {
+        compile_time: macros::compile_time!(),
+        base_url: installer::BASE_URL.into(),
+        pkg_version: env!("CARGO_PKG_VERSION").into(),
+    }
+}
+
+#[tauri::command]
+pub async fn create_uri() -> Result<()> {
+    convert_err(installer::uri::register_uri().await)
+}
+
+#[tauri::command]
+pub fn create_shortcuts(studio_versions: Vec<&str>) -> Result<()> {
+    convert_err(installer::uri::create_studio_shortcuts(studio_versions))
+}
+
+#[tauri::command]
+pub async fn launch_studio(year: &str) -> Result<()> {
+    convert_err(studio::launch_studio(year).await)
+}
+
+#[tauri::command]
+pub async fn launch_client(year: &str, version: &str, args: Vec<&str>) -> Result<()> {
+    convert_err(player::launch_client(year, version, &args).await)
+}
+
+#[tauri::command]
+pub fn get_cli() -> Vec<String> {
+    env::args().collect()
 }

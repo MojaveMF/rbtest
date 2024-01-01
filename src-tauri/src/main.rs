@@ -33,7 +33,13 @@ fn main() {
                 commands::client_installed,
                 commands::prepare_client,
                 commands::get_client_folder,
-                commands::get_latest_version
+                commands::get_latest_version,
+                commands::get_bootstrapper_info,
+                commands::get_cli,
+                commands::create_uri,
+                commands::create_shortcuts,
+                commands::launch_studio,
+                commands::launch_client
             ]
         )
         .setup(|app| {
