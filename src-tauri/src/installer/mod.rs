@@ -74,6 +74,7 @@ pub async fn create_manifest_dirs<L: AsRef<Path>>(location: L, paths: Vec<&str>)
 
 pub async fn download_from_repo<T: AsRef<str>>(file: T) -> Result<Vec<u8>> {
     let file = file.as_ref();
+
     let target_file = format!(
         "https://raw.githubusercontent.com/{}/{}/{}",
         REPO_NAME,

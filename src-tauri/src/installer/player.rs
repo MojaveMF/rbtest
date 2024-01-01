@@ -64,6 +64,7 @@ pub fn installed<T: AsRef<str>, V: AsRef<str>>(year: T, version: V) -> bool {
 pub async fn get_client_manifest<T: AsRef<str>>(version: T) -> Result<HashMap<String, String>> {
     let version = version.as_ref();
     let bytes = download_from_repo(format!("data/manifest/{}.json", version)).await?;
+    println!("{}", String::from_utf8(bytes.clone()).unwrap());
     let hashmap = serde_json::from_slice(&bytes)?;
 
     Ok(hashmap)
