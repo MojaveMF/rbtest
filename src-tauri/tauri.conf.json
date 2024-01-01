@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "SYNTAX",
-    "version": "0.0.0"
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -15,6 +15,9 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "path": {
+       "all": true
       },
       "process": {
         "all": false,

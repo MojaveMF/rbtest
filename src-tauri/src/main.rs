@@ -4,8 +4,8 @@
 use std::{ fmt::Display, error::Error };
 use tauri::Manager;
 
-mod installer;
 mod commands;
+mod installer;
 
 #[derive(Debug)]
 pub struct FailedInit;
@@ -23,17 +23,23 @@ fn main() {
         ::default()
         .invoke_handler(
             tauri::generate_handler![
-                commands::info,
-                commands::get_targets,
-                commands::latest_version,
-                commands::create_directorys,
-                commands::register_uri,
-                commands::download_to_zip,
+                commands::get_available_studio,
+                commands::studio_installed,
+                commands::install_studio,
+                commands::get_valid_clients,
+                commands::get_client_manifest,
+                commands::download_zip,
                 commands::extract_zip,
-                commands::is_installed,
-                commands::get_launch,
-                commands::join_game,
-                commands::generate_appsettings
+                commands::client_installed,
+                commands::prepare_client,
+                commands::get_client_folder,
+                commands::get_latest_version,
+                commands::get_bootstrapper_info,
+                commands::get_cli,
+                commands::create_uri,
+                commands::create_shortcuts,
+                commands::launch_studio,
+                commands::launch_client
             ]
         )
         .setup(|app| {

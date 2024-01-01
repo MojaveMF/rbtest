@@ -1,48 +1,65 @@
-import { z } from "zod";
 import { invoke } from "@tauri-apps/api";
-
-export async function joinGame(
-  version: string,
-  { client_year, auth_ticket, join_script }: LaunchArguments
-) {
-  await invoke("join_game", {
-    version: version,
-    clientYear: client_year,
-    authTicket: auth_ticket,
-    joinScript: join_script,
-  });
+import { GetStudios, InstallStudio, LaunchStudio, StudioInstalled } from "./studio";
+import { CreateShortcuts, CreateUri, GetLatestversion, GetValidClients, clientInstalled } from ".";
+import Installer, { LaunchClient, SetTaskbar } from "./client";
+import { exit } from "@tauri-apps/api/process";
+let args_cache: string[] | undefined;
+async function GetLaunchArguments(): Promise<string[]> {
+  if (args_cache === undefined) {
+    args_cache = await invoke("get_cli");
+  }
+  return args_cache!;
 }
 
-const launchArguments = z.array(z.string()).min(2);
-const clientYears = ["2020", "2018", "2016", "2014"] as const;
-const clientYear = z.enum(clientYears);
+export async function IsStudio() {
+  let args = await GetLaunchArguments();
+  if (args.length < 3) {
+    return false;
+  }
+  return args[1] === "--studio";
+}
+
+async function GetStudioVersions(): Promise<string[]> {
+  return Object.keys(await GetStudios());
+}
+
+async function GetStudioLaunch(): Promise<string> {
+  let launch_args = await GetLaunchArguments();
+  let launched_version = launch_args[2];
+
+  if (!(await GetStudioVersions()).includes(launched_version))
+    throw `${launched_version} dose not have a studio`;
+  return launched_version;
+}
 
 export type LaunchArguments = {
   launch_mode: string;
   auth_ticket: string;
   join_script: string;
-  client_year: (typeof clientYears)[number];
+  client_year: string;
 };
 
-export async function GetLaunchArguments(): Promise<LaunchArguments> {
-  const matches = await invoke("get_launch");
-  const valid = launchArguments.parse(matches);
+let cachedParsed: LaunchArguments | undefined;
 
-  const args = valid[1].replace("syntax-player://", "").split("+");
+export async function GetPlayerLaunchArguments(): Promise<LaunchArguments> {
+  if (cachedParsed !== undefined) return cachedParsed;
+  let uri = (await GetLaunchArguments())[1];
+  if (!uri || !uri.startsWith("syntax-player://")) throw "No player launch arguments";
+
+  let uriArguments = uri.split("+");
 
   let launch_mode: string | undefined;
   let auth_ticket: string | undefined;
   let join_script: string | undefined;
-  let client_year: (typeof clientYears)[number] | undefined;
+  let client_year: string | undefined;
 
-  console.log("PARSINGS ", args);
+  let validClients = GetValidClients();
 
-  for (let arg of args) {
+  for (let arg of uriArguments) {
     let index = arg.indexOf(":");
     let first = arg.substring(0, index),
       last = arg.substring(index + 1);
 
-    console.log([first, last]);
     switch (first) {
       case "launchmode": {
         launch_mode = last;
@@ -57,7 +74,7 @@ export async function GetLaunchArguments(): Promise<LaunchArguments> {
         continue;
       }
       case "clientyear": {
-        client_year = clientYear.parse(last);
+        client_year = last;
         continue;
       }
       default:
@@ -71,16 +88,56 @@ export async function GetLaunchArguments(): Promise<LaunchArguments> {
     throw "Authticket undefined";
   } else if (join_script === undefined) {
     throw "Joinscript undefined";
-  } else if (client_year === undefined) {
-    throw "Client year undefined";
+  } else if (client_year === undefined || !(await validClients).includes(client_year)) {
+    throw "Client year undefined or invalid";
   }
 
-  console.log(args);
-
-  return {
+  cachedParsed = {
     launch_mode,
     auth_ticket,
     join_script,
     client_year,
   };
+  return GetPlayerLaunchArguments();
+}
+
+export async function GetLaunchedVersion(): Promise<string> {
+  if (await IsStudio()) {
+    return GetStudioLaunch();
+  }
+  return (await GetPlayerLaunchArguments()).client_year;
+}
+
+export async function HandleLaunch() {
+  try {
+    let launched_version = await GetLaunchedVersion();
+    if (await IsStudio()) {
+      SetTaskbar(`Studio ${launched_version} launched`, 0);
+      if (await StudioInstalled(launched_version)) {
+        SetTaskbar(`Studio ${launched_version} installed`, 100);
+        await LaunchStudio(launched_version);
+      }
+      await InstallStudio(launched_version);
+    } else {
+      SetTaskbar(`Client ${launched_version} launched`, 0);
+      let latest_version = await GetLatestversion();
+      if (await clientInstalled(launched_version, latest_version)) {
+        SetTaskbar(`Client ${launched_version} installed`, 0);
+        await LaunchClient(launched_version, latest_version, await GetPlayerLaunchArguments());
+      }
+      let installer = new Installer(launched_version, latest_version, true);
+      await installer.Download();
+    }
+    return HandleLaunch();
+  } catch (err) {
+    if (String(err) !== `No player launch arguments`) throw err;
+    SetTaskbar(`Registering uri`, 0);
+    await CreateUri();
+    SetTaskbar(`Creating shortcuts`, 50);
+    await CreateShortcuts(await GetStudioVersions());
+    SetTaskbar(`Done closing...`, 100);
+    setTimeout(async () => {
+      await exit(0);
+    }, 2000);
+  }
 }
