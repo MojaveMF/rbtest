@@ -49,7 +49,8 @@ rand = "0.8.5"
 [target.'cfg(windows)'.dependencies]
 mslnk = "0.1.8"
 winreg = "0.52.0"
-#[target.'cfg(target_os = "linux")'.dependencies]
+
+[target.'cfg(target_os = "linux")'.dependencies]
 serde_ini = "0.2.0"
 
 [features]

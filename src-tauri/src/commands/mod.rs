@@ -117,8 +117,8 @@ pub async fn create_uri() -> Result<()> {
 }
 
 #[tauri::command]
-pub fn create_shortcuts(studio_versions: Vec<&str>) -> Result<()> {
-    convert_err(installer::uri::create_studio_shortcuts(studio_versions))
+pub async fn create_shortcuts(studio_versions: Vec<&str>) -> Result<()> {
+    convert_err(installer::uri::create_studio_shortcuts(studio_versions).await)
 }
 
 #[tauri::command]
