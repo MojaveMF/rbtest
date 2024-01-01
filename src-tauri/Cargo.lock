@@ -2980,6 +2980,7 @@ dependencies = [
  "chrono",
  "dirs",
  "futures-util",
+ "rand 0.8.5",
  "reqwest",
  "serde",
  "serde-xml-rs",

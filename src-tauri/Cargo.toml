@@ -41,6 +41,7 @@ tokio = { version = "1.35.1", features = ["fs"] }
 zip-extract = "0.1.2"
 futures-util = "0.3.30"
 serde-xml-rs = "0.6.0"
+rand = "0.8.5"
 
 # Remove platform specific dependencies
 

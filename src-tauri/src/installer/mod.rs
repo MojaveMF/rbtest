@@ -1,4 +1,6 @@
-use std::error::Error;
+use std::{ error::Error, path::Path, fs::{ self, File }, io::Write };
+use futures_util::StreamExt;
+use rand::{ distributions::Alphanumeric, Rng };
 
 pub mod uri;
 pub mod paths;
@@ -19,8 +21,55 @@ pub const TARGET_BRANCH: &str = "release";
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+pub async fn download_file<U: AsRef<str>, L: AsRef<Path>>(url: U, location: L) -> Result<()> {
+    let url = url.as_ref();
+    let file = location.as_ref();
+    let result = reqwest::get(url).await?;
+
+    let mut file = fs::File::create(file)?;
+    let mut stream = result.bytes_stream();
+
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk?;
+        file.write_all(&chunk)?;
+    }
+
+    Ok(())
+}
+
+pub async fn extract_zip<F: AsRef<Path>, T: AsRef<Path>>(from: F, to: T) -> Result<()> {
+    zip_extract::extract(File::open(from)?, to.as_ref(), false)?;
+    Ok(())
+}
+
+pub async fn download_and_extract<U: AsRef<str>, O: AsRef<Path>>(url: U, out: O) -> Result<()> {
+    let download_url = url.as_ref();
+    let file_name =
+        rand::thread_rng().sample_iter(&Alphanumeric).take(10).map(char::from).collect::<String>() +
+        ".zip";
+    let output_file = paths::get_downloads_folder()?.join(file_name);
+
+    download_file(download_url, &output_file).await?;
+    extract_zip(output_file, out).await?;
+
+    Ok(())
+}
+
+pub async fn create_manifest_dirs<L: AsRef<Path>>(location: L, paths: Vec<&str>) -> Result<()> {
+    let location = location.as_ref().to_path_buf();
+    for path in paths {
+        let mut p = String::new();
+        for split in path.split("/") {
+            p += split;
+            fs::create_dir(location.join(&p))?;
+        }
+    }
+
+    Ok(())
+}
+
 pub async fn download_from_repo<T: AsRef<str>>(file: T) -> Result<Vec<u8>> {
-    let mut file = file.as_ref();
+    let file = file.as_ref();
     let target_file = format!(
         "https://raw.githubusercontent.com/{}/{}/{}",
         REPO_NAME,

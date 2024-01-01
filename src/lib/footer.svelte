@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { GetBootstrapperInfo } from "./interface/index";
+  //import { GetBootstrapperInfo } from "./interface/index";
 </script>
 
 <footer class="footer_container">
   <span class="footer_text">
+    <!--
     {#await GetBootstrapperInfo()}
       Waiting for info
     {:then { base_url, compile_time, pkg_version }}
@@ -11,5 +12,6 @@
     {:catch err}
       Failed to get bootstrapper info
     {/await}
+    -->
   </span>
 </footer>

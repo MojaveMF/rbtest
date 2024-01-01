@@ -44,6 +44,10 @@ pub fn get_app_folder() -> Result<PathBuf> {
     Ok(path)
 }
 
+pub fn get_downloads_folder() -> Result<PathBuf> {
+    dir_wrapper(get_app_folder()?.join("Downloads"))
+}
+
 pub fn get_clients_folder() -> Result<PathBuf> {
     let app_folder = get_app_folder()?;
     let clients = app_folder.join("clients");

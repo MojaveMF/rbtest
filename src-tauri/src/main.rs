@@ -4,6 +4,7 @@
 use std::{ fmt::Display, error::Error };
 use tauri::Manager;
 
+mod commands;
 mod installer;
 
 #[derive(Debug)]
@@ -20,7 +21,15 @@ impl Error for FailedInit {}
 fn main() {
     tauri::Builder
         ::default()
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(
+            tauri::generate_handler![
+                commands::get_available_studio,
+                commands::studio_installed,
+                commands::install_studio,
+                commands::get_valid_clients,
+                commands::get_client_manifest
+            ]
+        )
         .setup(|app| {
             let Some(window) = app.get_window("SYNTAX") else {
                 return Err(FailedInit.into());
