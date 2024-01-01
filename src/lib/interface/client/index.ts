@@ -30,9 +30,9 @@ export async function LaunchClient(year: string, version: string, launch_args: L
     ],
   });
 
-  await SetTaskbar("Studio launched", 100);
+  await SetTaskbar("Client launched", 100);
   setTimeout(async () => {
-    await exit(0);
+    //await exit(0);
   }, 3000);
 }
 
