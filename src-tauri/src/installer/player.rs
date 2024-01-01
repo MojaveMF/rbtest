@@ -42,12 +42,12 @@ pub async fn prepare_client<T: AsRef<str>, V: AsRef<str>>(
     let client_path = get_client_folder(year, version)?;
 
     /* There was an issue when using .collect() */
-    let mut keys: Vec<&str> = vec![];
-    for key in manifest.keys() {
-        keys.push(key);
+    let mut values: Vec<&str> = vec![];
+    for value in manifest.values() {
+        values.push(value);
     }
 
-    create_manifest_dirs(&client_path, keys).await?;
+    create_manifest_dirs(&client_path, values).await?;
 
     Ok(())
 }

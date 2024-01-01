@@ -37,7 +37,12 @@ async function GetClientFolder(year: string, version: string): Promise<string> {
 }
 
 async function download_zip(fileName: string) {
-  return await invoke("download_zip", { fileName });
+  try {
+    return await invoke("download_zip", { fileName });
+  } catch (err) {
+    console.log(fileName, "Failed with", err);
+    throw err;
+  }
 }
 
 async function extract_zip(fileName: string, location: string) {
@@ -59,7 +64,9 @@ export async function InstallClient(year: string) {
   let folder = await GetClientFolder(year, version);
   let manifest = await GetManifest(year);
 
-  await prepare_client(year, version, manifest);
+  try {
+    await prepare_client(year, version, manifest);
+  } catch (err) {}
 
   let downloads = [];
   for (let key of Object.keys(manifest)) {
