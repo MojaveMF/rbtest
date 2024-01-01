@@ -116,6 +116,7 @@ export async function HandleLaunch() {
       if (await StudioInstalled(launched_version)) {
         SetTaskbar(`Studio ${launched_version} installed`, 100);
         await LaunchStudio(launched_version);
+        return;
       }
       await InstallStudio(launched_version);
     } else {
@@ -124,6 +125,7 @@ export async function HandleLaunch() {
       if (await clientInstalled(launched_version, latest_version)) {
         SetTaskbar(`Client ${launched_version} installed`, 0);
         await LaunchClient(launched_version, latest_version, await GetPlayerLaunchArguments());
+        return;
       }
       let installer = new Installer(launched_version, latest_version, true);
       await installer.Download();
