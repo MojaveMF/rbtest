@@ -1,17 +1,3 @@
 {
-    "SyntaxApp.zip":"",
-    "NPSyntaxProxy.zip":"",
-    "Libraries.zip":"",
-    "redist.zip":"",
-    "content-fonts.zip":"content/fonts",
-    "content-music.zip":"content/music",
-    "content-particles.zip":"content/particles",
-    "content-sky.zip":"content/sky",
-    "content-sounds.zip":"content/sounds",
-    "content-textures.zip":"content/textures",
-    "content-textures2.zip":"content/textures",
-    "content-scripts.zip":"content/scripts",
-    "shaders.zip":"shaders",
-    "content-terrain.zip":"PlatformContent/pc/terrain",
-    "content-textures3.zip":"PlatformContent/pc/textures"
+    "2016client.zip": ""
 }
