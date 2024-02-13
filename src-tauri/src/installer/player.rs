@@ -80,9 +80,6 @@ pub async fn prepare_client<T: AsRef<str>, V: AsRef<str>>(
     let year = year.as_ref();
     let client_path = get_client_folder(year, version)?;
 
-    if year == "2016" {
-        generate_appsettings(&client_path).await?;
-    }
 
     /* There was an issue when using .collect() */
     let mut values: Vec<&str> = vec![];
