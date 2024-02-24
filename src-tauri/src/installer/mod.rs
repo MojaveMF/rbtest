@@ -8,11 +8,11 @@ pub mod paths;
 pub mod studio;
 pub mod player;
 
-pub const APP_NAME: &str = "Syntax";
-pub const BASE_URL: &str = "www.syntax.eco";
-pub const SETUP_URL: &str = "setup.syntax.eco";
+pub const APP_NAME: &str = "RbTest";
+pub const BASE_URL: &str = "www.rbtest.org";
+pub const SETUP_URL: &str = "setup.rbtest.org";
 
-pub const REPO_NAME: &str = "MojaveMF/syntax";
+pub const REPO_NAME: &str = "MojaveMF/rbtest";
 
 #[cfg(debug_assertions)]
 pub const TARGET_BRANCH: &str = "main";
